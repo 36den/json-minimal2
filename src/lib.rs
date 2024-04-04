@@ -176,7 +176,6 @@ impl<'a> Json<'a> {
                 }
 
                 if *c == '\"' {
-                    index += 1;
                     return Self::parse_string(&mut input, &mut index);
                 }
 
@@ -184,8 +183,12 @@ impl<'a> Json<'a> {
                     return Self::parse_number(&mut input, &mut index);
                 }
 
-                if *c == 't' || *c == 'f' {
-
+                if *c == 't' {
+                    return Self::parse_true(&mut input, &mut index);
+                }
+                
+                if *c == 'f' {
+                    return Self::parse_false(&mut input, &mut index);
                 }
 
                 if *c == 'n' {
@@ -292,13 +295,7 @@ impl<'a> Json<'a> {
         }
     }
 
-    fn parse_bool(input_iter: &mut impl Iterator<Item = char>) -> Result<Json,ParseError> {
-        todo!()
-
-        // Here check if 't' or 'f', and forward to parse_true or parse_false
-    }
-
-    fn parse_true(input_iter: &mut impl Iterator<Item = char>) -> Result<Json,ParseError> {
+    fn parse_true(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
         todo!()
 
         // Best to advance char by char, as in: 
@@ -306,13 +303,13 @@ impl<'a> Json<'a> {
         // is next char 'u'? ...etc
     }
 
-    fn parse_false(input_iter: &mut impl Iterator<Item = char>) -> Result<Json,ParseError> {
+    fn parse_false(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>>,ParseError> {
         todo!()
 
         // same as above
     }
 
-    fn parse_null(input_iter: &mut impl Iterator<Item = char>) -> Result<Json,ParseError> {
+    fn parse_null(input: &mut Vec<char>, index: &mut usize) -> Result<Json,ParseError> {
         todo!()
 
         // Same as above
