@@ -168,11 +168,11 @@ impl<'a> Json<'a> {
             if !c.is_ascii_whitespace() {
 
                 if *c == '{' {
-
+                    return Self::parse_object(&mut input, &mut index);
                 }
 
                 if *c == '[' {
-
+                    return Self::parse_array(&mut input, &mut index);
                 }
 
                 if *c == '\"' {
@@ -219,9 +219,49 @@ impl<'a> Json<'a> {
     }
 
     fn parse_value(input: &mut Vec<char>, index: &mut usize)  -> Result<Json<'a>,ParseError> {
-        todo!()
+        while *index < input.len() {
 
-        // Make this the same as Self::parse.
+            let c = &input[*index];
+
+            if !c.is_ascii_whitespace() {
+
+                if *c == '{' {
+                    return Self::parse_object(input, index);
+                }
+
+                if *c == '[' {
+                    return Self::parse_array(input, index);
+                }
+
+                if *c == '\"' {
+                    return Self::parse_string(input, index);
+                }
+
+                if c.is_ascii_digit() {
+                    return Self::parse_number(input, index);
+                }
+
+                if *c == 't' {
+                    return Self::parse_true(input, index);
+                }
+                
+                if *c == 'f' {
+                    return Self::parse_false(input, index);
+                }
+
+                if *c == 'n' {
+                    return Self::parse_null(input, index);
+                }
+
+            }
+
+            *index += 1;
+        }
+
+        
+            
+        return Err(ParseError::UnexpectedEnding);
+
     }
 
     fn parse_string(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
