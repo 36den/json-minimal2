@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
-pub enum Json<'a> {
-    Object(HashMap<&'a str,Json<'a>>),
-    Array(Vec<Json<'a>>),
+pub enum Json {
+    Object(HashMap<String,Json>),
+    Array(Vec<Json>),
     String(String),
     Number(f64),
     Bool(bool),
@@ -20,16 +20,16 @@ pub enum ParseError {
     Undefined
 }
 
-impl<'a> Json<'a> {
-    pub fn new_object() -> Json<'a> {
+impl Json {
+    pub fn new_object() -> Json {
         Json::Object(HashMap::new())
     }
 
-    pub fn new_array() -> Json<'a> {
+    pub fn new_array() -> Json {
         Json::Array(Vec::new())
     }
 
-    pub fn string_from(value: &str) -> Json<'a> {
+    pub fn string_from(value: &str) -> Json {
         Json::String(String::from(value))
     }
 
@@ -48,18 +48,18 @@ impl<'a> Json<'a> {
     }
 
     // maybe it would be better to just panic
-    pub fn insert(&mut self, name: &'a str, value: Json<'a>) {
+    pub fn insert(&mut self, name: &str, value: Json) {
         match self {
             Json::Object(name_value_pairs) => {
 
-                name_value_pairs.insert(name,value);
+                name_value_pairs.insert(name.to_owned(),value);
 
             },
             _ => {}
         }
     }
 
-    pub fn get(&mut self, name: &'a str) -> Option<&Json<'a>> {
+    pub fn get(&mut self, name: &str) -> Option<&Json> {
         match self {
             Json::Object(name_value_pairs) => {
                 name_value_pairs.get(name)
@@ -81,7 +81,7 @@ impl<'a> Json<'a> {
         }
     }
 
-    pub fn push(&mut self, new_value: Json<'a>) {
+    pub fn push(&mut self, new_value: Json) {
         match self {
             Json::Array(values) => {
 
@@ -92,7 +92,7 @@ impl<'a> Json<'a> {
         }
     }
 
-    pub fn pull(&self, index: usize) -> Option<&Json<'a>> {
+    pub fn pull(&self, index: usize) -> Option<&Json> {
         match self {
             Json::Array(values) => {
                 values.get(index)
@@ -156,7 +156,7 @@ impl<'a> Json<'a> {
         }
     }
 
-    pub fn parse(input: &'a str) -> Result<Json,ParseError> {
+    pub fn parse(input: &str) -> Result<Json,ParseError> {
         let mut input: Vec<char> = input.chars().collect();
 
         let mut index: usize = 0;
@@ -206,19 +206,106 @@ impl<'a> Json<'a> {
 
     }
 
-    fn parse_object(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
-        todo!()
+    fn parse_object(input: &mut Vec<char>, index: &mut usize) -> Result<Json,ParseError> {
 
-        // Five it a go in the same style.
+        *index += 1;
+
+        let mut object = HashMap::new();
+
+        while *index < input.len() {
+            let c = input[*index];
+
+            if !c.is_ascii_whitespace() {
+                if c != '\"' {
+                    return Err(ParseError::UnexpectedSymbol);
+                } else {
+                    break;
+                }
+            }
+
+            *index += 1;
+        }
+        
+        while *index < input.len(){
+
+            let name = Self::parse_string(input,index)?;
+
+            let c = input[*index];
+
+            if c == ':' {
+                *index += 1;
+            } else {
+                return Err(ParseError::UnexpectedSymbol);
+            }
+
+            let value = Self::parse_value(input,index)?;
+
+            let c = input[*index];
+
+            if c == ',' {
+
+                match name {
+                    Json::String(name) => {
+                        object.insert(name,value);
+                    },
+                    _ => {
+                        unreachable!()
+                    }
+                }
+
+                *index += 1;
+
+            } else if c == '}' {
+
+                match name {
+                    Json::String(name) => {
+                        object.insert(name,value);
+                    },
+                    _ => {
+                        unreachable!()
+                    }
+                }
+
+                *index += 1;
+
+                return Ok(Json::Object(object));
+            } else {
+                return Err(ParseError::UnexpectedSymbol);
+            }
+        }
+
+        Err(ParseError::UnexpectedEnding)
+
     }
 
-    fn parse_array(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
-        todo!()
+    fn parse_array(input: &mut Vec<char>, index: &mut usize) -> Result<Json,ParseError> {
 
-        // Give it a go in the same style.
+        *index += 1;
+
+        let mut array = Vec::<Json>::new();
+        
+        while *index < input.len(){
+
+            let value = Self::parse_value(input,index)?;
+
+            array.push(value);
+
+            let c = input[*index];
+
+            if c == ',' {
+                *index += 1;
+            } else if c == ']' {
+                *index += 1;
+                return Ok(Json::Array(array));
+            } else {
+                return Err(ParseError::UnexpectedSymbol);
+            }
+        }
+
+        Err(ParseError::UnexpectedEnding)
     }
 
-    fn parse_value(input: &mut Vec<char>, index: &mut usize)  -> Result<Json<'a>,ParseError> {
+    fn parse_value(input: &mut Vec<char>, index: &mut usize)  -> Result<Json,ParseError> {
         while *index < input.len() {
 
             let c = &input[*index];
@@ -264,7 +351,7 @@ impl<'a> Json<'a> {
 
     }
 
-    fn parse_string(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
+    fn parse_string(input: &mut Vec<char>, index: &mut usize) -> Result<Json,ParseError> {
 
         *index += 1;
 
@@ -299,7 +386,7 @@ impl<'a> Json<'a> {
         Ok(Json::String(string))
     }
 
-    fn parse_number(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
+    fn parse_number(input: &mut Vec<char>, index: &mut usize) -> Result<Json,ParseError> {
         
 
         let mut number = String::new();
@@ -337,8 +424,8 @@ impl<'a> Json<'a> {
         }
     }
 
-    fn parse_true(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
-        
+    fn parse_true(input: &mut Vec<char>, index: &mut usize) -> Result<Json,ParseError> {
+
         *index += 1;
 
         if *index >= input.len() {
@@ -390,7 +477,7 @@ impl<'a> Json<'a> {
         // is next char 'u'? ...etc
     }
 
-    fn parse_false(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
+    fn parse_false(input: &mut Vec<char>, index: &mut usize) -> Result<Json,ParseError> {
         
         *index += 1;
 
@@ -450,7 +537,7 @@ impl<'a> Json<'a> {
         // same as above
     }
 
-    fn parse_null(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
+    fn parse_null(input: &mut Vec<char>, index: &mut usize) -> Result<Json,ParseError> {
         
         *index += 1;
 
@@ -531,7 +618,21 @@ mod tests {
 
         my_object.insert("Forgotten",Json::Null);
 
-        assert_eq!("{\"Amount of days in a week\":7,\"Days of the week\":[\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\",\"Friday\",\"Saturday\",\"Sunday\"],\"Forgotten\":null,\"True or false\":true,\"Greeting\":\"Hello, you!\"}",my_object.print());
+        let parsed = Json::parse(&my_object.print());
+
+        assert_eq!(Ok(my_object),parsed);
+    }
+
+    #[test]
+    fn parse_object() {
+        let json = "  {   \"Greeting\" : \"Hello, world!\" } " ;
+
+        let parsed = Json::parse(json);
+
+        let mut check = HashMap::new();
+        check.insert("Greeting".to_string(),Json::string_from("Hello, world!"));
+
+        assert_eq!(Ok(Json::Object(check)), parsed);
     }
 
     #[test]
