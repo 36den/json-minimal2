@@ -192,7 +192,7 @@ impl<'a> Json<'a> {
                 }
 
                 if *c == 'n' {
-
+                    return Self::parse_null(&mut input, &mut index);
                 }
 
             }
@@ -411,7 +411,51 @@ impl<'a> Json<'a> {
     }
 
     fn parse_null(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
-        todo!()
+        
+        *index += 1;
+
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 'u' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        *index += 1;
+
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 'l' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        *index += 1;
+
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 'l' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        while *index < input.len() {
+
+            let c = input[*index];
+
+            if !c.is_ascii_whitespace() {
+                if c == ',' || c == ']' || c == '}' {
+                    return Ok(Json::Null);
+                }
+            }
+
+            *index += 1;
+        }
+
+        Ok(Json::Null)
 
         // Same as above
     }
