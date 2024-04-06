@@ -15,7 +15,7 @@ pub enum Json {
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
     UnexpectedEnding,
-    UnexpectedSymbol,
+    UnexpectedSymbol(char),
     NumberParsingError,
     Undefined
 }
@@ -217,7 +217,7 @@ impl Json {
 
             if !c.is_ascii_whitespace() {
                 if c != '\"' {
-                    return Err(ParseError::UnexpectedSymbol);
+                    return Err(ParseError::UnexpectedSymbol(c));
                 } else {
                     break;
                 }
@@ -235,7 +235,7 @@ impl Json {
             if c == ':' {
                 *index += 1;
             } else {
-                return Err(ParseError::UnexpectedSymbol);
+                return Err(ParseError::UnexpectedSymbol(c));
             }
 
             let value = Self::parse_value(input,index)?;
@@ -270,7 +270,7 @@ impl Json {
 
                 return Ok(Json::Object(object));
             } else {
-                return Err(ParseError::UnexpectedSymbol);
+                return Err(ParseError::UnexpectedSymbol(c));
             }
         }
 
@@ -298,7 +298,7 @@ impl Json {
                 *index += 1;
                 return Ok(Json::Array(array));
             } else {
-                return Err(ParseError::UnexpectedSymbol);
+                return Err(ParseError::UnexpectedSymbol(c));
             }
         }
 
@@ -433,7 +433,7 @@ impl Json {
         }
 
         if input[*index] != 'r' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         *index += 1;
@@ -443,7 +443,7 @@ impl Json {
         }
 
         if input[*index] != 'u' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         *index += 1;
@@ -453,7 +453,7 @@ impl Json {
         }
 
         if input[*index] != 'e' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         while *index < input.len() {
@@ -486,7 +486,7 @@ impl Json {
         }
 
         if input[*index] != 'a' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         *index += 1;
@@ -496,7 +496,7 @@ impl Json {
         }
 
         if input[*index] != 'l' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         *index += 1;
@@ -506,7 +506,7 @@ impl Json {
         }
 
         if input[*index] != 's' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         *index += 1;
@@ -516,7 +516,7 @@ impl Json {
         }
 
         if input[*index] != 'e' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         while *index < input.len() {
@@ -546,7 +546,7 @@ impl Json {
         }
 
         if input[*index] != 'u' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         *index += 1;
@@ -556,7 +556,7 @@ impl Json {
         }
 
         if input[*index] != 'l' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         *index += 1;
@@ -566,7 +566,7 @@ impl Json {
         }
 
         if input[*index] != 'l' {
-            return Err(ParseError::UnexpectedSymbol);
+            return Err(ParseError::UnexpectedSymbol(input[*index]));
         }
 
         while *index < input.len() {
