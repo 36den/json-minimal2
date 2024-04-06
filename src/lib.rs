@@ -226,6 +226,8 @@ impl<'a> Json<'a> {
 
     fn parse_string(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
 
+        *index += 1;
+
         let mut string = String::new();
 
         while *index < input.len() {
@@ -296,20 +298,119 @@ impl<'a> Json<'a> {
     }
 
     fn parse_true(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
-        todo!()
+        
+        *index += 1;
+
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 'r' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        *index += 1;
+
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 'u' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        *index += 1;
+
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 'e' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        while *index < input.len() {
+
+            let c = input[*index];
+
+            if !c.is_ascii_whitespace() {
+                if c == ',' || c == ']' || c == '}' {
+                    return Ok(Json::Bool(true));
+                }
+            }
+
+            *index += 1;
+        }
+
+        Ok(Json::Bool(true))
+        
 
         // Best to advance char by char, as in: 
         // is next char 'r'? yes, continue. no, error.
         // is next char 'u'? ...etc
     }
 
-    fn parse_false(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>>,ParseError> {
-        todo!()
+    fn parse_false(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
+        
+        *index += 1;
 
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 'a' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        *index += 1;
+
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 'l' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        *index += 1;
+
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 's' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        *index += 1;
+
+        if *index >= input.len() {
+            return Err(ParseError::UnexpectedEnding);
+        }
+
+        if input[*index] != 'e' {
+            return Err(ParseError::UnexpectedSymbol);
+        }
+
+        while *index < input.len() {
+
+            let c = input[*index];
+
+            if !c.is_ascii_whitespace() {
+                if c == ',' || c == ']' || c == '}' {
+                    return Ok(Json::Bool(false));
+                }
+            }
+
+            *index += 1;
+        }
+
+        Ok(Json::Bool(false))
+        
         // same as above
     }
 
-    fn parse_null(input: &mut Vec<char>, index: &mut usize) -> Result<Json,ParseError> {
+    fn parse_null(input: &mut Vec<char>, index: &mut usize) -> Result<Json<'a>,ParseError> {
         todo!()
 
         // Same as above
