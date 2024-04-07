@@ -621,21 +621,23 @@ mod tests {
 
     #[test]
     fn it_works2() {
-        let mut json = Json::new_object();
+        let mut json = r#"{
+            "First": "Line",
+            "Second": "Line",
+            "Third": "Line"
+        }"#;
 
-        json.insert("First", Json::string_from("Line"));
+        let parsed = Json::parse(json);
 
-        json.insert("Second", Json::string_from("Line"));
+        let mut compare = Json::new_object();
 
-        json.insert("Third", Json::string_from("Line"));
-
-        json.insert("First", Json::string_from("Line"));
-
-        let parsed = Json::parse(&json.to_string());
+        compare.insert("First", Json::string_from("Line"));
+        compare.insert("Second", Json::string_from("Line"));
+        compare.insert("Third", Json::string_from("Line"));
 
         println!("{:?}",parsed);
 
-        assert_eq!(Ok(json),parsed);
+        assert_eq!(Ok(compare),parsed);
     }
 
     #[test]
@@ -715,4 +717,5 @@ mod tests {
 
         assert_eq!(Ok(Json::Null),parsed);
     }
+
 }
