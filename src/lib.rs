@@ -201,22 +201,22 @@ impl Json {
         *index += 1;
 
         let mut object = HashMap::new();
-
-        while *index < input.len() {
-            let c = input[*index];
-
-            if !c.is_ascii_whitespace() {
-                if c != '\"' {
-                    return Err(());
-                } else {
-                    break;
-                }
-            }
-
-            *index += 1;
-        }
         
         while *index < input.len(){
+
+            while *index < input.len() {
+                let c = input[*index];
+    
+                if !c.is_ascii_whitespace() {
+                    if c != '\"' {
+                        return Err(());
+                    } else {
+                        break;
+                    }
+                }
+    
+                *index += 1;
+            }
 
             let name = Self::parse_string(input,index)?;
 
@@ -224,6 +224,9 @@ impl Json {
 
             if c == ':' {
                 *index += 1;
+                if *index >= input.len() {
+                    return Err(());
+                }
             } else {
                 return Err(());
             }
@@ -621,7 +624,7 @@ mod tests {
 
     #[test]
     fn it_works2() {
-        let mut json = r#"{
+        let json = r#"{
             "First": "Line",
             "Second": "Line",
             "Third": "Line"
@@ -634,6 +637,44 @@ mod tests {
         compare.insert("First", Json::string_from("Line"));
         compare.insert("Second", Json::string_from("Line"));
         compare.insert("Third", Json::string_from("Line"));
+
+        println!("{:?}",parsed);
+
+        assert_eq!(Ok(compare),parsed);
+    }
+
+    #[test]
+    fn it_works3() {
+        let json = r#"{ "First":"Line", "Second":"Line","Third":"Line"}"#;
+
+        let parsed = Json::parse(json);
+
+        let mut compare = Json::new_object();
+
+        compare.insert("First", Json::string_from("Line"));
+        compare.insert("Second", Json::string_from("Line"));
+        compare.insert("Third", Json::string_from("Line"));
+
+        println!("{:?}",parsed);
+
+        assert_eq!(Ok(compare),parsed);
+    }
+
+    #[test]
+    fn it_works4() {
+        let json = r#"[
+            "First",
+            "Second",
+            "Third"
+        ]"#;
+
+        let parsed = Json::parse(json);
+
+        let mut compare = Json::new_array();
+
+        compare.push(Json::string_from("First"));
+        compare.push(Json::string_from("Second"));
+        compare.push(Json::string_from("Third"));
 
         println!("{:?}",parsed);
 
