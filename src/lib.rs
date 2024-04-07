@@ -93,7 +93,7 @@ impl Json {
         }
     }
 
-    pub fn print(&self) -> String {
+    pub fn to_string(&self) -> String {
         match self {
             Json::Object(name_value_pairs) => {
                 let mut output = String::new();
@@ -101,7 +101,7 @@ impl Json {
                 output.push_str("{");
 
                 for (name,value) in name_value_pairs {
-                    output.push_str(&format!("\"{}\":{},",name,value.print()));
+                    output.push_str(&format!("\"{}\":{},",name,value.to_string()));
                 }
 
                 output.pop();
@@ -117,7 +117,7 @@ impl Json {
                 output.push_str("[");
 
                 for value in values {
-                    output.push_str(&value.print());
+                    output.push_str(&value.to_string());
                     output.push_str(",");
                 }
 
@@ -334,9 +334,7 @@ impl Json {
 
             *index += 1;
         }
-
-        
-            
+   
         return Err(());
 
     }
@@ -519,8 +517,7 @@ impl Json {
         }
 
         Ok(Json::Bool(false))
-        
-        // same as above
+
     }
 
     fn parse_null(input: &mut Vec<char>, index: &mut usize) -> Result<Json,()> {
@@ -597,6 +594,11 @@ mod tests {
         days_of_the_week.push(Json::string_from("Saturday"));
         days_of_the_week.push(Json::string_from("Sunday"));
 
+        let mut sub_object = Json::new_object();
+
+        sub_object.insert("Comment", Json::string_from("Have I forgotten anything?"));
+
+        days_of_the_week.push(sub_object);
 
         my_object.insert("Days of the week",days_of_the_week);
 
@@ -604,14 +606,41 @@ mod tests {
 
         my_object.insert("Forgotten",Json::Null);
 
-        let parsed = Json::parse(&my_object.print());
+        let mut sub_object = Json::new_object();
+
+        sub_object.insert("Comment", Json::string_from("This is a comment"));
+
+        my_object.insert("Other",sub_object);
+
+        println!("{}",my_object.to_string());
+
+        let parsed = Json::parse(&my_object.to_string());
 
         assert_eq!(Ok(my_object),parsed);
     }
 
     #[test]
+    fn it_works2() {
+        let mut json = Json::new_object();
+
+        json.insert("First", Json::string_from("Line"));
+
+        json.insert("Second", Json::string_from("Line"));
+
+        json.insert("Third", Json::string_from("Line"));
+
+        json.insert("First", Json::string_from("Line"));
+
+        let parsed = Json::parse(&json.to_string());
+
+        println!("{:?}",parsed);
+
+        assert_eq!(Ok(json),parsed);
+    }
+
+    #[test]
     fn parse_object() {
-        let json = "  {   \"Greeting\" : \"Hello, world!\" } " ;
+        let json = "  {   \"Greeting\"   :   \"Hello, world!\"   } " ;
 
         let parsed = Json::parse(json);
 
