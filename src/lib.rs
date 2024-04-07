@@ -153,35 +153,35 @@ impl Json {
 
         while index < input.len() {
 
-            let c = &input[index];
+            let c = input[index];
 
             if !c.is_ascii_whitespace() {
 
-                if *c == '{' {
+                if c == '{' {
                     return Self::parse_object(&mut input, &mut index);
                 }
 
-                if *c == '[' {
+                if c == '[' {
                     return Self::parse_array(&mut input, &mut index);
                 }
 
-                if *c == '\"' {
+                if c == '\"' {
                     return Self::parse_string(&mut input, &mut index);
                 }
 
-                if c.is_ascii_digit() || *c == '-' {
+                if c.is_ascii_digit() || c == '-' {
                     return Self::parse_number(&mut input, &mut index);
                 }
 
-                if *c == 't' {
+                if c == 't' {
                     return Self::parse_true(&mut input, &mut index);
                 }
                 
-                if *c == 'f' {
+                if c == 'f' {
                     return Self::parse_false(&mut input, &mut index);
                 }
 
-                if *c == 'n' {
+                if c == 'n' {
                     return Self::parse_null(&mut input, &mut index);
                 }
 
@@ -298,35 +298,35 @@ impl Json {
     fn parse_value(input: &mut Vec<char>, index: &mut usize)  -> Result<Json,()> {
         while *index < input.len() {
 
-            let c = &input[*index];
+            let c = input[*index];
 
             if !c.is_ascii_whitespace() {
 
-                if *c == '{' {
+                if c == '{' {
                     return Self::parse_object(input, index);
                 }
 
-                if *c == '[' {
+                if c == '[' {
                     return Self::parse_array(input, index);
                 }
 
-                if *c == '\"' {
+                if c == '\"' {
                     return Self::parse_string(input, index);
                 }
 
-                if c.is_ascii_digit() || *c == '-' {
+                if c.is_ascii_digit() || c == '-' {
                     return Self::parse_number(input, index);
                 }
 
-                if *c == 't' {
+                if c == 't' {
                     return Self::parse_true(input, index);
                 }
                 
-                if *c == 'f' {
+                if c == 'f' {
                     return Self::parse_false(input, index);
                 }
 
-                if *c == 'n' {
+                if c == 'n' {
                     return Self::parse_null(input, index);
                 }
 
