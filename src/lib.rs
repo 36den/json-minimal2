@@ -49,7 +49,16 @@ impl Json {
         }
     }
 
-    pub fn get(&mut self, name: &str) -> Option<&Json> {
+    pub fn contains_key(&mut self, name: &str) -> bool {
+        match self {
+            Json::Object(name_value_pairs) => {
+                name_value_pairs.contains_key(name)
+            },
+            _ => { false }
+        }
+    }
+
+    pub fn get_value_from(&mut self, name: &str) -> Option<&Json> {
         match self {
             Json::Object(name_value_pairs) => {
                 name_value_pairs.get(name)
@@ -82,7 +91,18 @@ impl Json {
         }
     }
 
-    pub fn pull(&self, index: usize) -> Option<&Json> {
+    pub fn contains(&self, value: &Json) -> bool {
+        match self {
+            Json::Array(values) => {
+                values.contains(value)
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
+    pub fn get_value_at(&self, index: usize) -> Option<&Json> {
         match self {
             Json::Array(values) => {
                 values.get(index)
