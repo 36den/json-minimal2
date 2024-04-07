@@ -169,7 +169,7 @@ impl Json {
                     return Self::parse_string(&mut input, &mut index);
                 }
 
-                if c.is_ascii_digit() {
+                if c.is_ascii_digit() || *c == '-' {
                     return Self::parse_number(&mut input, &mut index);
                 }
 
@@ -314,7 +314,7 @@ impl Json {
                     return Self::parse_string(input, index);
                 }
 
-                if c.is_ascii_digit() {
+                if c.is_ascii_digit() || *c == '-' {
                     return Self::parse_number(input, index);
                 }
 
@@ -382,7 +382,7 @@ impl Json {
         while *index < input.len() {
             let c = input[*index];
 
-            if c.is_ascii_digit() || c == '.' || c == 'e' || c == 'E' {
+            if c.is_ascii_digit() || c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-' {
                 number.push(c);
             } else {
                 break;
