@@ -255,36 +255,49 @@ impl Json {
 
             let c = input[*index];
 
-            if c == ',' {
+            while *index < input.len() {
+                let c = input[*index];
 
-                match name {
-                    Json::String(name) => {
-                        object.insert(name,value);
-                    },
-                    _ => {
-                        unreachable!()
+                if !c.is_ascii_whitespace() {
+
+                    if c == ',' {
+
+                        match name {
+                            Json::String(name) => {
+                                object.insert(name,value);
+                            },
+                            _ => {
+                                unreachable!()
+                            }
+                        }
+        
+                        *index += 1;
+                        break;
+        
+                    } else if c == '}' {
+        
+                        match name {
+                            Json::String(name) => {
+                                object.insert(name,value);
+                            },
+                            _ => {
+                                unreachable!()
+                            }
+                        }
+        
+                        *index += 1;
+        
+                        return Ok(Json::Object(object));
+                    } else {
+                        return Err(());
                     }
+
                 }
-
+                
                 *index += 1;
-
-            } else if c == '}' {
-
-                match name {
-                    Json::String(name) => {
-                        object.insert(name,value);
-                    },
-                    _ => {
-                        unreachable!()
-                    }
-                }
-
-                *index += 1;
-
-                return Ok(Json::Object(object));
-            } else {
-                return Err(());
             }
+
+            
         }
 
         Err(())
@@ -664,7 +677,7 @@ mod tests {
 
     #[test]
     fn it_works3() {
-        let json = r#"{ "First":"Line", "Second":"Line","Third":"Line"}"#;
+        let json = r#"{ "First":"Line", "Second":"Line", "Third":"Line"}"#;
 
         let parsed = Json::parse(json);
 
@@ -708,8 +721,8 @@ mod tests {
             },
             "00002": {
                 "name": null
-            }
-        }"#;
+            }    
+    }"#;
 
         let parsed = Json::parse(json);
 
