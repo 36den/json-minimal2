@@ -590,7 +590,6 @@ impl Json {
 
         Ok(Json::Null)
 
-        // Same as above
     }
 }
 
@@ -777,6 +776,40 @@ mod tests {
         let parsed = Json::parse(json);
 
         assert_eq!(Ok(Json::Null),parsed);
+    }
+
+    #[test]
+    fn special_case() {
+        let json = r#"{
+            "00001": {
+                "name": "First Workspace",
+                "description": "Hello, this is a sample workspace. Don't really know what to write here. Maybe you write something. Something nice. Something decent. Figure it out, punk."
+            },
+            "00002": {
+                "name": "Second Workspace",
+                "description": "Hello, this is a sample workspace. Don't really know what to write here. Maybe you write something. Something nice. Something decent. Figure it out, punk."
+            },
+            "00003": {
+                "name": "Third Workspace",
+                "description": "Hello, this is a sample workspace. Don't really know what to write here. Maybe you write something. Something nice. Something decent. Figure it out, punk."
+            }
+        
+        }"#;
+
+        if let Ok(json) = Json::parse(json) {
+
+            match json {
+                Json::Object(json) => {
+
+                },
+                _ => {
+                    panic!("Unexpected Json Type");
+                }
+            }
+
+        } else {
+            panic!("Wasn't able to parse");
+        }
     }
 
 }
